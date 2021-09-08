@@ -12,7 +12,7 @@ first = True
 lockup = False
 lock_count = 0 #for keeping track of lockup sounds made
 
-#global dictionary for finding files to be renamed
+#global dictionary for finding files to be renamed, to prevent need for 32 swngs and others, maybe use a count variable to name instead, might be a better option.
 versoDict = {
     "swng01.wav" : "aswing1.wav",
     "swng02.wav" : "aswing2.wav",
@@ -92,7 +92,7 @@ versoDict = {
     "in.wav" : "off1.wav",
     "in01.wav" : "off1.wav",
     "in02.wav" : "off2.wav",
-    "lock01.wav" : "lockup.wav", #note: proffie has the begin lockup separate, not the case for verso, I can use pydub to stitch the individual audio files together holy crap
+    "lock01.wav" : "lockup.wav", #note: proffie has the begin lockup separate, not the case for verso, I can use pydub to stitch the individual audio files together
     "lock.wav" : "lockup.wav",
     "lowbatt.wav" : "lowbatt.wav",
     "out.wav" : "on1.wav",
@@ -122,7 +122,7 @@ versoDict = {
     "bgnlock2.wav" : "bgnlock2.wav",
     "bgnlock3.wav" : "bgnlock3.wav",
     "bgnlock4.wav" : "bgnlock4.wav"
-    } #still dont have mute, unmute, or select, not necessary though, can run fine without, most fonts seem to
+    } #still dont have mute, unmute, or select, not necessary though, can run fine without, will be addressed later on
 
 #file dialog setup
 root = tk.Tk()
@@ -197,5 +197,5 @@ os.mkdir(verso_path) #makes new font folder in destination
 copy_wavs(proffie_path) #copies audio files over
 rename() #renames all files properly
 stitch() #properly stitches bgnlock with lock to create proper lockup sound for verso
-open_final()
+open_final() #opens finished verso folder
 #now to make stuff for the config file!
