@@ -12,7 +12,7 @@ first = True
 lockup = False
 lock_count = 0 #for keeping track of lockup sounds made
 
-#global dictionary for finding files to be renamed, to prevent need for 32 swngs and others, maybe use a count variable to name instead, might be a better option.
+#global dictionary for finding files to be renamed
 versoDict = {
     "swng01.wav" : "aswing1.wav",
     "swng02.wav" : "aswing2.wav",
@@ -92,7 +92,7 @@ versoDict = {
     "in.wav" : "off1.wav",
     "in01.wav" : "off1.wav",
     "in02.wav" : "off2.wav",
-    "lock01.wav" : "lockup.wav", #note: proffie has the begin lockup separate, not the case for verso, I can use pydub to stitch the individual audio files together
+    "lock01.wav" : "lockup.wav", #note: proffie has the begin lockup separate, not the case for verso, I can use pydub to stitch the individual audio files together holy crap
     "lock.wav" : "lockup.wav",
     "lowbatt.wav" : "lowbatt.wav",
     "out.wav" : "on1.wav",
@@ -122,13 +122,67 @@ versoDict = {
     "bgnlock2.wav" : "bgnlock2.wav",
     "bgnlock3.wav" : "bgnlock3.wav",
     "bgnlock4.wav" : "bgnlock4.wav"
-    } #still dont have mute, unmute, or select, not necessary though, can run fine without, will be addressed later on
+    } #still dont have mute, unmute, or select, not necessary though, can run fine without, most fonts seem to
 
 #file dialog setup
 root = tk.Tk()
 root.withdraw()
+prof_win = tk.Tk()
+
+#finds screen center
+center_x = prof_win.winfo_screenwidth()
+center_x = int(center_x/2 - 300)
+center_y = prof_win.winfo_screenheight()
+center_y = int(center_y/2 - 200)
+
 
 #FUNCTIONS TO BE USED
+def verso_grab():
+    global verso_path
+    verso_path = filedialog.askdirectory()
+    return verso_path
+
+def proffie_grab():
+    global proffie_path
+    proffie_path = filedialog.askdirectory()
+    return proffie_path
+
+
+def next_win():
+    global verso_path
+    if proffie_path != "":
+        def convert():
+            global verso_path
+            if verso_path != "":
+                verso_path = verso_path + '/Verso_' + font_name()
+                os.mkdir(verso_path)
+                copy_wavs(proffie_path)
+                rename()
+                stitch()
+                verso_win.destroy()
+                open_final()
+                quit()
+            else:
+                error_lbl2 = tk.Label(verso_win, text = "No folder was selected, please select a destination", bg = "red", fg = "white")
+                error_lbl2.place(x = 100, y = 350)
+            return
+        prof_win.destroy()
+        verso_win = tk.Tk()
+        verso_win.geometry(f'600x400+{center_x}+{center_y}')
+        verso_win.title('Proffie to Verso Conversion')
+        verso_win.resizable(False,False)
+        text_lab = tk.Label(verso_win, text = "Please select the end destination for the Verso font")
+        text_lab.place(x=170,y=150)
+        profSelect_btn = tk.Button(verso_win, text = "Select Verso Folder", bd = '10', command=verso_grab)
+        profSelect_btn.place(x = 240, y = 200)
+        finish_btn = tk.Button(verso_win, text = "Convert", bd = '10', command=convert)
+        finish_btn.place(x = 520, y = 350)
+    else:
+        error_lbl1 = tk.Label(prof_win, text = "No folder was selected, please select a proffie font", bg = "red", fg = "white")
+        error_lbl1.place(x = 100, y = 350)
+    return
+
+
 def requestDestination(path): #functional
     global first
     if first == True:
@@ -189,13 +243,22 @@ def open_final():
     path = os.path.realpath(path)
     os.startfile(path)
 
-#main:
-proffie_path = requestDestination(proffie_path) #grabs the proffie folder
-verso_path = requestDestination(verso_path) #grabs verso destination
-verso_path = verso_path + '/Verso_' + font_name() #creates new font name
-os.mkdir(verso_path) #makes new font folder in destination
-copy_wavs(proffie_path) #copies audio files over
-rename() #renames all files properly
-stitch() #properly stitches bgnlock with lock to create proper lockup sound for verso
-open_final() #opens finished verso folder
-#now to make stuff for the config file!
+
+#screen setup
+prof_win.geometry(f'600x400+{center_x}+{center_y}')
+prof_win.title('Proffie to Verso Conversion')
+prof_win.resizable(False,False)
+
+text_lab = tk.Label(prof_win, text = "Please select the Proffie font to be converted")
+text_lab.place(x=180,y=150)
+
+profSelect_btn = tk.Button(prof_win, text = "Select Proffie Folder", bd = '10', command=proffie_grab)
+profSelect_btn.place(x = 240, y = 200)
+
+toVerso_btn = tk.Button(prof_win, text = "Next", bd = '10', command=next_win)
+toVerso_btn.place(x = 540, y = 350)
+
+#begins program run
+prof_win.mainloop()
+#still need to add option to enter the font name...
+#still need to try and grab smoothswing config settings to output a config option...
