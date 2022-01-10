@@ -140,46 +140,37 @@ center_y = int(center_y/2 - 200)
 def verso_grab():
     global verso_path
     verso_path = filedialog.askdirectory()
+    if verso_path != "":
+        error_lbl_verso.place_forget()
     return verso_path
 
 def proffie_grab():
     global proffie_path
     proffie_path = filedialog.askdirectory()
+    if proffie_path != "":
+        error_lbl_prof.place_forget()
     return proffie_path
 
-
-def next_win():
+def convert(): #functional
     global verso_path
-    if proffie_path != "":
-        def convert():
-            global verso_path
-            if verso_path != "":
-                verso_path = verso_path + '/Verso_' + font_name()
-                os.mkdir(verso_path)
-                copy_wavs(proffie_path)
-                rename()
-                stitch()
-                verso_win.destroy()
-                open_final()
-                quit()
-            else:
-                error_lbl2 = tk.Label(verso_win, text = "No folder was selected, please select a destination", bg = "red", fg = "white")
-                error_lbl2.place(x = 100, y = 350)
-            return
-        prof_win.destroy()
-        verso_win = tk.Tk()
-        verso_win.geometry(f'600x400+{center_x}+{center_y}')
-        verso_win.title('Proffie to Verso Conversion')
-        verso_win.resizable(False,False)
-        text_lab = tk.Label(verso_win, text = "Please select the end destination for the Verso font")
-        text_lab.place(x=170,y=150)
-        profSelect_btn = tk.Button(verso_win, text = "Select Verso Folder", bd = '10', command=verso_grab)
-        profSelect_btn.place(x = 240, y = 200)
-        finish_btn = tk.Button(verso_win, text = "Convert", bd = '10', command=convert)
-        finish_btn.place(x = 520, y = 350)
-    else:
-        error_lbl1 = tk.Label(prof_win, text = "No folder was selected, please select a proffie font", bg = "red", fg = "white")
-        error_lbl1.place(x = 100, y = 350)
+    global proffie_path
+    bad_conv = 0
+    if verso_path == "":
+        error_lbl_verso.place(x = 100, y = 350)
+        bad_conv += 1
+    if proffie_path == "":
+        error_lbl_prof.place(x = 100, y = 300)
+        bad_conv += 1
+    if bad_conv > 0:
+        return
+    verso_path = verso_path + '/Verso_' + font_name()
+    os.mkdir(verso_path)
+    copy_wavs(proffie_path)
+    rename()
+    stitch()
+    open_final()
+    verso_path = ""
+    proffie_path = ""
     return
 
 
@@ -238,10 +229,15 @@ def font_name(): #functional
     hold = hold.replace("proffie","")
     return hold
 
-def open_final():
+def open_final(): #functional
     path = verso_path
     path = os.path.realpath(path)
     os.startfile(path)
+
+def end_program():
+    prof_win.destroy()
+    root.destroy()
+    return
 
 
 #screen setup
@@ -249,16 +245,31 @@ prof_win.geometry(f'600x400+{center_x}+{center_y}')
 prof_win.title('Proffie to Verso Conversion')
 prof_win.resizable(False,False)
 
-text_lab = tk.Label(prof_win, text = "Please select the Proffie font to be converted")
-text_lab.place(x=180,y=150)
+error_lbl_verso = tk.Label(prof_win, text = "No Verso folder was selected, please select a destination", bg = "red", fg = "white")
+error_lbl_verso.place(x = 100, y = 350)
+error_lbl_verso.place_forget()
+
+error_lbl_prof = tk.Label(prof_win, text = "No Proffie folder was selected, please select a destination", bg = "red", fg = "white")
+error_lbl_prof.place(x = 100, y = 300)
+error_lbl_prof.place_forget()
+
+text_lab = tk.Label(prof_win, text = "Please select the Proffie font folder and the Verso font destination")
+text_lab.place(x=130,y=150)
 
 profSelect_btn = tk.Button(prof_win, text = "Select Proffie Folder", bd = '10', command=proffie_grab)
-profSelect_btn.place(x = 240, y = 200)
+profSelect_btn.place(x = 130, y = 200)
 
-toVerso_btn = tk.Button(prof_win, text = "Next", bd = '10', command=next_win)
-toVerso_btn.place(x = 540, y = 350)
+versoSelect_btn = tk.Button(prof_win, text = "Select Verso Destination", bd = '10', command=verso_grab)
+versoSelect_btn.place(x = 330, y = 200)
+
+finish_btn = tk.Button(prof_win, text = "Convert", bd = '10', command=convert)
+finish_btn.place(x = 520, y = 350)
+
+quit_btn = tk.Button(prof_win, text = "Exit", bd = '10', command=end_program)
+quit_btn.place(x = 5, y = 350)
 
 #begins program run
 prof_win.mainloop()
+
 #still need to add option to enter the font name...
 #still need to try and grab smoothswing config settings to output a config option...
