@@ -1,0 +1,3 @@
+1/17/22:
+- Added some quality of life features to the UI, including a message after successful font conversion
+- Copied over the font.wav an extra time to be renamed as boot1.wav, so that the font sound will trigger when the board is turned on
