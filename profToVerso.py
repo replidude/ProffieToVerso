@@ -171,6 +171,7 @@ def convert(): #functional
     open_final()
     verso_path = ""
     proffie_path = ""
+    converted_lbl.place(x = 220, y = 100)
     return
 
 
@@ -191,6 +192,10 @@ def copy_wavs(path1): #functional
     for filename in os.listdir(path1):
         if filename in versoDict:
             full_name = path1 + '/' + filename
+            if filename.__contains__("font"):
+                shutil.copy(full_name, verso_path)
+                os.rename(verso_path + '/' + filename, verso_path + '/boot1.wav')
+                sleep(1)
             shutil.copy(full_name, verso_path)
         elif filename.__contains__('.'):
             continue
@@ -201,8 +206,9 @@ def copy_wavs(path1): #functional
 def rename(): #functional
     global verso_path
     for filename in os.listdir(verso_path):
-        temp = versoDict[filename]
-        os.rename(verso_path + '/' + filename, verso_path + '/' + temp)
+        if filename in versoDict:
+            temp = versoDict[filename]
+            os.rename(verso_path + '/' + filename, verso_path + '/' + temp)
 
 
 def stitch(): #functional
@@ -252,6 +258,10 @@ error_lbl_verso.place_forget()
 error_lbl_prof = tk.Label(prof_win, text = "No Proffie folder was selected, please select a destination", bg = "red", fg = "white")
 error_lbl_prof.place(x = 100, y = 300)
 error_lbl_prof.place_forget()
+
+converted_lbl = tk.Label(prof_win, text = "Font Conversion Successful!", bg = "green", fg = "white")
+converted_lbl.place(x = 250, y = 100)
+converted_lbl.place_forget()
 
 text_lab = tk.Label(prof_win, text = "Please select the Proffie font folder and the Verso font destination")
 text_lab.place(x=130,y=150)
